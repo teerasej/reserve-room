@@ -6,6 +6,8 @@ use \Firebase\JWT\JWT;
 
 $app->post('/signin', function (Request $request, Response $response) {
 
+
+
     // Get username and password
     $data = $request->getParsedBody();
     $username = $data['username'];
@@ -46,9 +48,9 @@ $app->post('/signin', function (Request $request, Response $response) {
         if (count($current_user) != 0 && !$token_from_db) {
 
             // Prepare data for token
-            $key = "nextflow_banana";
+            $key = $this->get('settings')['tokenSecretKey'];
             $payload = array(
-                "iss" => "http://www.nextflow.com",
+                "iss" => "http://localhost",
                 "iat" => time(),
                 "exp" => time() + (3600 * 24 * 15),
                 "context" => [
@@ -89,3 +91,40 @@ $app->post('/signin', function (Request $request, Response $response) {
     }
 
 });
+
+$app->get('/restricted', function (Request $request, Response $response) {
+    $jwt = $request->getHeaders();
+    $key = $this->get('settings')['tokenSecretKey'];
+
+    $this->logger->addInfo($jwt['HTTP_AUTHORIZATION'][0]);
+
+    try {
+        $decoded = JWT::decode($jwt['HTTP_AUTHORIZATION'][0], $key, array('HS256'));
+    } catch (UnexpectedValueException $e) {
+        echo $e->getMessage();
+    }
+    if (isset($decoded)) {
+        $sql = "SELECT * FROM tokens WHERE user_id = :user_id";
+        try {
+            $db = $this->db;
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam("user_id", $decoded->context->user->user_id);
+            $stmt->execute();
+            $user_from_db = $stmt->fetchObject();
+            $db = null;
+            if (isset($user_from_db->user_id)) {
+                echo json_encode([
+                    "response" => "This is your secure resource !"
+                ]);
+            } else {
+                echo json_encode([
+                    "response" => "Sorry, you are not allowed"
+                ]);
+            }
+        } catch (PDOException $e) {
+            echo '{"error":{"text":' . $e->getMessage() . '}}';
+        }
+    }
+});
+
+?>

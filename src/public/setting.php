@@ -9,4 +9,6 @@ $config['db']['user'] = "root";
 $config['db']['pass'] = "root";
 $config['db']['dbname'] = "nextflow_reserve";
 
+$config['tokenSecretKey'] = "nextflow";
+
 ?>
