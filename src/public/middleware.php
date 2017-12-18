@@ -11,7 +11,7 @@ $app->add(function ($req, $res, $next) {
 
 $app->add(new \Slim\Middleware\JwtAuthentication([
     "secret" => 'nextflow',
-    "path" => "/restricted"
+    "path" => ["/restricted","/report/month"]
 ]));
 
 ?>
