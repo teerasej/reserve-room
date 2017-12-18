@@ -9,4 +9,9 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
 
+$app->add(new \Slim\Middleware\JwtAuthentication([
+    "secret" => 'nextflow',
+    "path" => "/restricted"
+]));
+
 ?>
