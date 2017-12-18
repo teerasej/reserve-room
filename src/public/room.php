@@ -1,4 +1,7 @@
 <?php
+use \Psr\Http\Message\ResponseInterface as Response;
+use \Psr\Http\Message\ServerRequestInterface as Request;
+
 
 $app->get('/room/reserved', function (Request $request, Response $response) {
     $params = $request->getQueryParams();
