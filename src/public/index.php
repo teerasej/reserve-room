@@ -19,6 +19,7 @@ $app->get('/hi', function (Request $request, Response $response) {
 });
 
 require 'room.php';
+require 'routes/report.php';
 require 'authen.php';
 
 // $app->get('/hello/{name}', function (Request $request, Response $response) {
